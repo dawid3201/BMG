@@ -37,4 +37,8 @@ public class BookAPI {
     public final ResponseEntity<List<Book>> findByType(@RequestParam("type") String type)  {
         return ResponseEntity.ok(this.bookService.findByType(type));
     }
+    @GetMapping("/findByUniverse")
+    public final ResponseEntity<List<Book>> findByUniverse(@RequestParam("universe") String universe)  {
+        return ResponseEntity.ok(this.bookService.findAllBooksByUniverse(universe));
+    }
 }

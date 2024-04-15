@@ -16,6 +16,7 @@ public class Book {
     private String description;
     private boolean status;
     private String type;
+    private String universe;
 
     private List<User> usersWhoRentsThisBook;
 

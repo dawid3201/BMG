@@ -48,7 +48,18 @@ public class BookService {
         }
         return bookList;
     }
+    public final List<Book> findAllBooksByUniverse(String universe){
+        List<Book> bookList = new ArrayList<>();
+        for(Book book : getBooks()){
+            if(book.getUniverse().equals(universe)){
+                bookList.add(book);
+            }
+        }
+        return bookList;
+    }
+    //Delete method
+    public final void deleteBook(Book book){
 
-    //method that returns books if they include title: Harry Potter should return all harry potters books
+    }
 
 }

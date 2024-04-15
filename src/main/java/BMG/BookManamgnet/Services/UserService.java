@@ -29,7 +29,7 @@ public class UserService {
                 userDAO.save(user);
             }
         }
-        return "Rental confirmed!";
+        return "Rental confirmed to user with email: " + user.getEmail();
     }
     public final User addUser(String name, String email){
         User user = new User();
