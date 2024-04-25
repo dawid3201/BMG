@@ -2,12 +2,11 @@ package BMG.BookManamgnet.API;
 
 import BMG.BookManamgnet.Entities.Book;
 import BMG.BookManamgnet.Services.BookService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import javax.management.BadAttributeValueExpException;
 import java.util.List;
@@ -17,12 +16,11 @@ public class BookAPI {
     private BookService bookService;
 
     @PostMapping("/addBook")
-    public ResponseEntity<Book> addBook(@RequestParam("title")String title,
-                        @RequestParam("author") String author,
-                        @RequestParam("dateOfRelease") String dateOfRelease,
-                        @RequestParam("description") String description,
-                                        @RequestParam("type") String type){
-        return ResponseEntity.ok(this.bookService.addBook(title,author,dateOfRelease,description, type));
+    public ResponseEntity<?> addBook(@Valid @RequestBody Book book, BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+        return ResponseEntity.ok(this.bookService.addBook(book));
     }
     @GetMapping("/getBooks")
     public ResponseEntity<List<Book>> getBooks(){

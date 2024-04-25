@@ -21,20 +21,19 @@ public class UserService {
         User user = userDAO.getUserByEmail(email);
         if(user != null){
             Book book = bookDAO.findBookByTitle(bookTitle);
-            if(book.getStatus()){
-                user.setNumberOfRentedBooks(user.getNumberOfRentedBooks()+1);
-                book.setStatus(false);
-                book.getUsersWhoRentsThisBook().add(user);
-                bookDAO.save(book);
+            if(book != null){
+                user.getRentedBooks().add(book.getTitle());
                 userDAO.save(user);
+
+                book.getUsersWhoRentsThisBook().add(user.getEmail());
+                bookDAO.save(book);
             }
+        }else{
+            return "No user with email: " + email + " exists.";
         }
         return "Rental confirmed to user with email: " + user.getEmail();
     }
-    public final User addUser(String name, String email){
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
+    public final User addUser(User user){
         return userDAO.save(user);
 
     }

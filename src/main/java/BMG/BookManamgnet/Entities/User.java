@@ -1,12 +1,13 @@
 package BMG.BookManamgnet.Entities;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
+import java.util.ArrayList;
 
 @Document
 @Data //For getters, setters
@@ -14,12 +15,14 @@ import java.util.List;
 @AllArgsConstructor
 public class User {
     @Id
+    @NotEmpty(message = "Email field cannot be empty")
     private String email;
 
+    @NotEmpty(message = "Name field cannot be empty")
     private String name;
-    private int booksRented;
-    private boolean isRentingABook;
-    private int numberOfRentedBooks;
-    private List<User> rentedBooks;
+
+    private ArrayList<Movie> rentedMovies = new ArrayList<>();
+
+    private ArrayList<String> rentedBooks = new ArrayList<>();
 
 }
