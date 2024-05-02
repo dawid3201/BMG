@@ -39,4 +39,8 @@ public class BookAPI {
     public final ResponseEntity<List<Book>> findByUniverse(@RequestParam("universe") String universe)  {
         return ResponseEntity.ok(this.bookService.findAllBooksByUniverse(universe));
     }
+    @DeleteMapping("/deleteBook")
+    public final ResponseEntity<String> deleteBook(@RequestParam("bookId") String bookId){
+        return ResponseEntity.ok(this.bookService.deleteBook(bookId));
+    }
 }

@@ -20,6 +20,7 @@ public class BookService {
     public final Book addBook(Book book){
         return bookDAO.save(book);
     }
+
     public final Book findByTitle(String title) throws BadAttributeValueExpException {
         Book book = bookDAO.findBookByTitle(title);
         if(book != null && book.getTitle().equals(title)){
@@ -45,5 +46,14 @@ public class BookService {
             }
         }
         return bookList;
+    }
+    public final String deleteBook(String bookId){
+        Book book = bookDAO.findBookByID(bookId);
+        if(book != null){
+            bookDAO.delete(book);
+            return "Book with ID: " + bookId + " has been deleted.";
+        }else{
+            return "Book with ID: " + bookId + " was not found.";
+        }
     }
 }
