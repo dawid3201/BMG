@@ -2,7 +2,6 @@ package BMG.BookManamgnet.API;
 
 import BMG.BookManamgnet.Entities.Book;
 import BMG.BookManamgnet.Services.BookService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -16,7 +15,7 @@ public class BookAPI {
     private BookService bookService;
 
     @PostMapping("/addBook")
-    public ResponseEntity<?> addBook(@Valid @RequestBody Book book, BindingResult bindingResult){
+    public ResponseEntity<?> addBook(@RequestBody Book book, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
@@ -40,7 +39,7 @@ public class BookAPI {
         return ResponseEntity.ok(this.bookService.findAllBooksByUniverse(universe));
     }
     @DeleteMapping("/deleteBook")
-    public final ResponseEntity<String> deleteBook(@RequestParam("bookId") String bookId){
+    public final ResponseEntity<String> deleteBook(@RequestParam("bookId") Long bookId){
         return ResponseEntity.ok(this.bookService.deleteBook(bookId));
     }
 }

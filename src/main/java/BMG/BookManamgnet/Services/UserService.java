@@ -1,9 +1,9 @@
 package BMG.BookManamgnet.Services;
 
 import BMG.BookManamgnet.Entities.Book;
-import BMG.BookManamgnet.Entities.User;
-import BMG.BookManamgnet.Repository.BookDAO;
-import BMG.BookManamgnet.Repository.UserDAO;
+import BMG.BookManamgnet.Entities.MyUser;
+import BMG.BookManamgnet.Repository.BookRepository;
+import BMG.BookManamgnet.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +12,11 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class UserService {
-    private final UserDAO userDAO;
-    private final BookDAO bookDAO;
+    private final UserRepository userRepository;
+    private final BookRepository bookDAO;
 
-    public final User getUser(String userId){
-        User user = userDAO.getUserByEmail(userId);
+    public final MyUser getUser(String userId){
+        MyUser user = userRepository.findByEmail(userId);
         if(user != null){
             if(user.getEmail().equals(userId)){
                 return user;
@@ -25,14 +25,14 @@ public class UserService {
         throw new IllegalArgumentException("User with email: " + userId + " not found!");
     }
     public String rentBook( String email, String bookTitle){
-        User user = userDAO.getUserByEmail(email);
+        MyUser user = userRepository.findByEmail(email);
         if(user != null){
             Book book = bookDAO.findBookByTitle(bookTitle);
             if(book != null){
-                user.getRentedBooks().add(book.getTitle());
-                userDAO.save(user);
+                user.getRentedBooks().add(book);
+                userRepository.save(user);
 
-                book.getUsersWhoRentsThisBook().add(user.getEmail());
+                book.getUsersWhoRentThisBook().add(user);
                 bookDAO.save(book);
             }
         }else{
@@ -40,14 +40,14 @@ public class UserService {
         }
         return "Rental confirmed to user with email: " + user.getEmail();
     }
-    public final List<User> getUsers(){
-        return userDAO.findAll();
+    public final List<MyUser> getUsers(){
+        return userRepository.findAll();
     }
 
     public final String deleteUser(String userId){
-        User user = userDAO.getUserByEmail(userId);
+        MyUser user = userRepository.findByEmail(userId);
         if(user != null){
-            userDAO.delete(user);
+            userRepository.delete(user);
             return "User with email: " + user.getEmail() + " has been deleted.";
         }
         throw new IllegalArgumentException("User with email: " + userId + " was not found.");

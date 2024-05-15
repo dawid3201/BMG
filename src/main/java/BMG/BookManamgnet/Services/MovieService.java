@@ -1,29 +1,25 @@
 package BMG.BookManamgnet.Services;
 
-import BMG.BookManamgnet.Entities.Book;
 import BMG.BookManamgnet.Entities.Movie;
-import BMG.BookManamgnet.Repository.MovieDAO;
-import BMG.BookManamgnet.Repository.UserDAO;
+import BMG.BookManamgnet.Repository.MovieRepository;
+import BMG.BookManamgnet.Repository.UserRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Slf4j
+@AllArgsConstructor
 @Service
 public class MovieService {
-    private final MovieDAO movieDAO;
-    private final UserDAO userDAO;
-    public MovieService(MovieDAO movieDAO, UserDAO userDAO){
-        this.movieDAO = movieDAO;
-        this.userDAO = userDAO;
-        log.info("MovieService has been created!");
-    }
+    private final MovieRepository movieRepository;
+    private final UserRepository userRepository;
 
-    public final List<Movie> getMovies(){return this.movieDAO.findAll();}
+    public final List<Movie> getMovies(){return this.movieRepository.findAll();}
 
     public final Movie addMovie(Movie movie){
         log.info("Adding movie: {}", movie);
-        return movieDAO.save(movie);
+        return movieRepository.save(movie);
     }
 
 }

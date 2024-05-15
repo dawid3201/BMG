@@ -1,40 +1,30 @@
 package BMG.BookManamgnet.Entities;
 
-import jakarta.validation.constraints.NotEmpty;
-import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Document
-@Data
+@Entity
+@Getter
+@Setter
+@Table(name = "books")
 public class Book {
     @Id
-    private String ID;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @NotEmpty(message = "Title field cannot be empty")
     private String title;
-
-    @NotEmpty(message = "Author field cannot be empty")
     private String author;
-
-    @NotEmpty(message = "Date of Release field cannot be empty")
     private String dateOfRelease;
-
-    @NotEmpty(message = "Description field cannot be empty")
     private String description;
-
-    @NotEmpty(message = "Type field cannot be empty")
     private String type;
-
-    @NotEmpty(message = "Universe field cannot be empty")
     private String universe;
 
-    private ArrayList<String> usersWhoRentsThisBook = new ArrayList<>();
-
-    public final List<String> getUsersWhoRentsThisBook(){
-        return this.usersWhoRentsThisBook;
-    }
+    @ManyToMany(mappedBy = "rentedBooks")
+    private List<MyUser> usersWhoRentThisBook = new ArrayList<>();
 }
+
+

@@ -1,28 +1,28 @@
 package BMG.BookManamgnet.Services;
 
 import BMG.BookManamgnet.Entities.Book;
-import BMG.BookManamgnet.Repository.BookDAO;
+import BMG.BookManamgnet.Repository.BookRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.management.BadAttributeValueExpException;
 import java.util.ArrayList;
 import java.util.List;
 @Service
+@AllArgsConstructor
 public class BookService {
-    private final BookDAO bookDAO;
+    private final BookRepository bookRepository;
 
-    public BookService(BookDAO bookDAO) {
-        this.bookDAO = bookDAO;
-    }
+
     public final List<Book> getBooks(){
-        return this.bookDAO.findAll();
+        return this.bookRepository.findAll();
     }
     public final Book addBook(Book book){
-        return bookDAO.save(book);
+        return bookRepository.save(book);
     }
 
     public final Book findByTitle(String title) throws BadAttributeValueExpException {
-        Book book = bookDAO.findBookByTitle(title);
+        Book book = bookRepository.findBookByTitle(title);
         if(book != null && book.getTitle().equals(title)){
             return book;
         }else{
@@ -47,10 +47,10 @@ public class BookService {
         }
         return bookList;
     }
-    public final String deleteBook(String bookId){
-        Book book = bookDAO.findBookByID(bookId);
+    public final String deleteBook(Long bookId){
+        Book book = bookRepository.findBookById(bookId);
         if(book != null){
-            bookDAO.delete(book);
+            bookRepository.delete(book);
             return "Book with ID: " + bookId + " has been deleted.";
         }else{
             return "Book with ID: " + bookId + " was not found.";

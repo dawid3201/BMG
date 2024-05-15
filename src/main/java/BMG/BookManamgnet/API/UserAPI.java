@@ -1,47 +1,41 @@
 package BMG.BookManamgnet.API;
 
-import BMG.BookManamgnet.Entities.Book;
-import BMG.BookManamgnet.Entities.Movie;
-import BMG.BookManamgnet.Entities.User;
-import BMG.BookManamgnet.Repository.UserDAO;
+import BMG.BookManamgnet.Entities.MyUser;
+import BMG.BookManamgnet.Repository.UserRepository;
 import BMG.BookManamgnet.Services.UserService;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.management.BadAttributeValueExpException;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @AllArgsConstructor
 public class UserAPI {
+//    private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
     private UserService userService;
-    private UserDAO userDAO;
-    private final PasswordEncoder passwordEncoder;
+
     //------------------------User Registration-----------------------
-    @PostMapping("/registerNewUser")
-    public ResponseEntity<User> getUserDetails(@RequestBody User user) throws Exception{
-        if(userDAO.existsByEmail(user.getEmail())){
-            throw new BadAttributeValueExpException("User with email: " + user.getEmail() + " already exists!");
+    @PostMapping("/register/user")
+    public MyUser createUser(@RequestBody MyUser user) throws Exception {
+        MyUser existUser = userRepository.findByEmail(user.getEmail());
+        if(existUser != null){
+            throw new BadAttributeValueExpException("User with email: " + user.getEmail() + " already exists.");
         }
-        user.setName(user.getName());
-        user.setEmail(user.getEmail());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.getRoles().add("USER");
-
-        user.setRentedMovies(new ArrayList<>());
-        user.setRentedBooks(new ArrayList<>());
-
-        userDAO.save(user);
-        return ResponseEntity.ok(user);
+        return userRepository.save(user);
     }
+
+    //For now, Users can be registerd on Postman. Login WORKS and redirect based on ROLES
+    //TODO: make register page register users and redirect them to proper page.
 
     @PostMapping("/rentBook")
     public final ResponseEntity<String> rentBook(@RequestParam("email") String email, @RequestParam("bookTitle") String bookTitle){
@@ -49,11 +43,11 @@ public class UserAPI {
     }
 
     @GetMapping("/getUsers")
-    public final ResponseEntity<List<User>> getUsers(){
+    public final ResponseEntity<List<MyUser>> getUsers(){
         return ResponseEntity.ok(this.userService.getUsers());
     }
     @GetMapping("/getUser")
-    public final ResponseEntity<User> getUser(@RequestParam("userId") String userId){
+    public final ResponseEntity<MyUser> getUser(@RequestParam("userId") String userId){
         return ResponseEntity.ok(this.userService.getUser(userId));
     }
     @DeleteMapping("/deleteUser")

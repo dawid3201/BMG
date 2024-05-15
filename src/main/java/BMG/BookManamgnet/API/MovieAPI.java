@@ -2,7 +2,6 @@ package BMG.BookManamgnet.API;
 
 import BMG.BookManamgnet.Entities.Movie;
 import BMG.BookManamgnet.Services.MovieService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -19,7 +18,7 @@ public class MovieAPI {
     private MovieService movieService;
 
     @PostMapping("/addMovie")
-    public final ResponseEntity<?> addMovie(@Valid @RequestBody Movie newMovie, BindingResult bindingResult){
+    public final ResponseEntity<?> addMovie(@RequestBody Movie newMovie, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             // Return validation errors
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
