@@ -1,6 +1,5 @@
 package BMG.BookManamgnet.Security;
 
-import BMG.BookManamgnet.Security.AppUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
