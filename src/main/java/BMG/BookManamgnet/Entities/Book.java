@@ -23,8 +23,6 @@ public class Book {
     private String type;
     private String universe;
 
-    @ManyToMany(mappedBy = "rentedBooks")
-    private List<MyUser> usersWhoRentThisBook = new ArrayList<>();
 }
 
 

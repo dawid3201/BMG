@@ -20,13 +20,5 @@ public class ContentController {
         return "Home_user";
     }
 
-    @GetMapping("/login")
-    public String handleLogin(){
-        return "Login";
-    }
 
-    @GetMapping("/register")
-    public String handleRegister(){
-        return "RegisterUser";
-    }
 }
