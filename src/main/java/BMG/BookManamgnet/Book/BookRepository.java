@@ -1,6 +1,6 @@
-package BMG.BookManamgnet.Repository;
+package BMG.BookManamgnet.Book;
 
-import BMG.BookManamgnet.Entities.Book;
+import BMG.BookManamgnet.Book.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 

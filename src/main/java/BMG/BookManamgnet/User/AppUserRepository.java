@@ -1,6 +1,6 @@
-package BMG.BookManamgnet.Repository;
+package BMG.BookManamgnet.User;
 
-import BMG.BookManamgnet.Entities.AppUser;
+import BMG.BookManamgnet.User.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

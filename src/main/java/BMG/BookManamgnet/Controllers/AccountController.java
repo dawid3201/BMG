@@ -2,9 +2,13 @@ package BMG.BookManamgnet.Controllers;
 
 import BMG.BookManamgnet.DTO.LoginDTO;
 import BMG.BookManamgnet.DTO.RegisterDTO;
-import BMG.BookManamgnet.Entities.AppUser;
-import BMG.BookManamgnet.Repository.AppUserRepository;
+import BMG.BookManamgnet.Role.Role;
+import BMG.BookManamgnet.Role.RoleRepository;
+import BMG.BookManamgnet.Security.SecretKeyGenerator;
+import BMG.BookManamgnet.User.AppUser;
+import BMG.BookManamgnet.User.AppUserRepository;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/account")
@@ -29,25 +34,30 @@ public class AccountController {
     @Value("${security.jwt.secret-key}")
     private String jwtSecretKey;
 
+    private SecretKeyGenerator secretKeyGenerator;
+
     @Value("${security.jwt.issuer}")
     private String jwtIssuer;
 
 
     private final AppUserRepository appUserRepository;
     private final AuthenticationManager authenticationManager;
+
+    private final RoleRepository roleRepository;
+
     @Autowired
-    public AccountController(AppUserRepository appUserRepository, AuthenticationManager authenticationManager) {
+    public AccountController(AppUserRepository appUserRepository,
+                             AuthenticationManager authenticationManager,
+                             RoleRepository roleRepository) {
         this.appUserRepository = appUserRepository;
         this.authenticationManager = authenticationManager;
+        this.roleRepository = roleRepository;
     }
-
-
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@RequestBody RegisterDTO registerDTO,
+    public ResponseEntity<Object> register(@Valid @RequestBody RegisterDTO registerDTO,
                                            BindingResult bindingResult){
-        //if there is any error, show it
         checkBindingResult(bindingResult);
-        //assign all necessary properties to new user
+
         var bCryptEncoder = new BCryptPasswordEncoder();
 
         AppUser appUser = new AppUser();
@@ -55,9 +65,8 @@ public class AccountController {
         appUser.setLastname(registerDTO.getLastName());
         appUser.setUsername(registerDTO.getUsername());
         appUser.setEmail(registerDTO.getEmail());
-        appUser.setRole("user");
+        CheckAdminCondition(registerDTO, appUser);
         appUser.setPassword(bCryptEncoder.encode(registerDTO.getPassword()));
-
         //save user to database
         try{
             var otherUser = appUserRepository.findByUsername(registerDTO.getUsername());
@@ -84,6 +93,7 @@ public class AccountController {
         //in case of other exceptions
         return ResponseEntity.badRequest().body("Error");
     }
+
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody LoginDTO loginDTO, BindingResult bindingResult){
         checkBindingResult(bindingResult);
@@ -94,8 +104,6 @@ public class AccountController {
                         loginDTO.getPassword()
                     )
             );
-            System.out.println("Print this message if function works");
-            System.out.println(appUserRepository); // Log to check if appUserRepository is null
             AppUser appUser = appUserRepository.findByUsername(loginDTO.getUsername());
             String jwtToken = createJwtToken(appUser);
 
@@ -103,15 +111,17 @@ public class AccountController {
             response.put("token", jwtToken);
             response.put("user", appUser);
 
+
             return ResponseEntity.ok(response);
 
         }catch (Exception exception){
             System.out.println("There is an Exception: ");
             exception.printStackTrace();
         }
-        System.out.println(appUserRepository); // Log to check if appUserRepository is null
+        System.out.println(appUserRepository);
         return ResponseEntity.badRequest().body("Bad username or password.");
     }
+    //-----------------HELPER-METHODS-------------------
     private void checkBindingResult(BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             var errorList = bindingResult.getAllErrors();
@@ -127,12 +137,15 @@ public class AccountController {
     private String createJwtToken(AppUser appUser){
         Instant now = Instant.now();
 
+        List<String> roleList = appUser.getRoles();
+        List<String> grantedAuthorities = roleList.stream().toList();
+
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer(jwtIssuer)
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(25 * 3600))
                 .subject(appUser.getEmail())
-                .claim("role", appUser.getRole())
+                .claim("roles", grantedAuthorities) //storing roles as ROLE_USER in JWT token
                 .build();
 
         var encoder = new NimbusJwtEncoder(
@@ -141,5 +154,13 @@ public class AccountController {
                 .with(MacAlgorithm.HS256).build(), claims);
         //create a jwt token
         return encoder.encode(params).getTokenValue();
+    }
+    private void CheckAdminCondition(RegisterDTO registerDTO, AppUser appUser) {
+        if (registerDTO.getAdminCondition()) {
+            appUser.getRoles().add("ROLE_USER");
+            appUser.getRoles().add("ROLE_ADMIN");
+        } else {
+            appUser.getRoles().add("ROLE_USER");
+        }
     }
 }

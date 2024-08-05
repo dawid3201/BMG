@@ -1,4 +1,4 @@
-package BMG.BookManamgnet.Entities;
+package BMG.BookManamgnet.Book;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -20,6 +20,9 @@ public class Book {
     private String type;
     private String universe;
 
+    //TODO: add availability, if book is rented then show book is unavailable
+    //private boolean available;
+    //private double price;
 }
 
 
