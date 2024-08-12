@@ -19,10 +19,9 @@ public class Book {
     private String description;
     private String type;
     private String universe;
+    private int copies;
 
-    //TODO: add availability, if book is rented then show book is unavailable
-    //private boolean available;
-    //private double price;
+
 }
 
 

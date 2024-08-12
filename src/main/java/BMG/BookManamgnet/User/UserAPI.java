@@ -18,12 +18,16 @@ public class UserAPI {
     public ResponseEntity<AppUser> getByUsername(@RequestParam("username") String username) throws UserNotFoundException {
        return ResponseEntity.ok(this.userService.getUser(username));
    }
-
    @PostMapping("/rentBook")
     public ResponseEntity<?> rentBook(@RequestParam("email") String email,
                                       @RequestParam("bookTitle") String bookTitle) throws UserAlreadyRentsThisBookException,
-           UserNotFoundException, BookNotFoundException {
+           UserNotFoundException, BookNotFoundException, NoAvailableCopiesException {
        return ResponseEntity.ok(userService.rentBook(email, bookTitle));
+   }
+   @PostMapping("/returnBook")
+   public ResponseEntity<Boolean> returnBook(@RequestParam("title") String title,
+                                       @RequestParam("userEmail") String userEmail) throws UserNotFoundException, BookNotFoundException {
+       return ResponseEntity.ok(userService.returnBook(title, userEmail));
    }
    @GetMapping("/getUsers")
     public ResponseEntity<List<AppUser>> getUsers(){

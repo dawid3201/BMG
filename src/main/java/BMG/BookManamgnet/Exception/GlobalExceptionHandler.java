@@ -31,4 +31,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleBookNotFoundException(BookNotFoundException ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+    @ExceptionHandler(NoBookTypeFoundException.class)
+    public ResponseEntity<String> handleNoBookTypeFoundException(NoBookTypeFoundException ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+    @ExceptionHandler(NoAvailableCopiesException.class)
+    public ResponseEntity<String> handleNoAvailableCopiesException(NoAvailableCopiesException ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
 }

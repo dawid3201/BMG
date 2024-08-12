@@ -1,14 +1,19 @@
 package BMG.BookManamgnet.Book;
 
 import BMG.BookManamgnet.Exception.BookAlreadyAddedException;
+import BMG.BookManamgnet.Exception.NoBookTypeFoundException;
+import BMG.BookManamgnet.User.AppUserRepository;
 import lombok.AllArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class BookService {
     private final BookRepository bookRepository;
+    private final AppUserRepository appUserRepository;
 
 
     public final List<Book> getBooks(){
@@ -23,6 +28,25 @@ public class BookService {
             }
         }
         return bookRepository.save(book);
+    }
+    public final List<Book> findByType(String type) throws NoBookTypeFoundException {
+        List<Book> specificTypeBooks = bookRepository.findAll().stream()
+                .filter(book -> book.getType().contains(type)).toList();
+
+        if(specificTypeBooks.isEmpty()){
+            throw new NoBookTypeFoundException("No books of type: " + type + " found.");
+        }
+        return specificTypeBooks;
+    }
+
+    public final List<Book> findByTitle(String title) throws NoBookTypeFoundException {
+        List<Book> specificTitleBooks = bookRepository.findAll().stream()
+                .filter(book -> book.getTitle().contains(title)).toList();
+
+        if(specificTitleBooks.isEmpty()){
+            throw new NoBookTypeFoundException("No books with title: " + title + " found.");
+        }
+        return specificTitleBooks;
     }
 
 }

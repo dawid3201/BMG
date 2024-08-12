@@ -1,7 +1,8 @@
 package BMG.BookManamgnet.User;
 
-import BMG.BookManamgnet.Book.Book;
-import BMG.BookManamgnet.Role.Role;
+import BMG.BookManamgnet.Book.HandelingBook.RentedBook;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +12,7 @@ import java.util.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Table(name = "my_user")
 public class AppUser {
     @Id
@@ -25,19 +27,13 @@ public class AppUser {
     private String email;
     private String password;
 
-    //TODO: keep user record. What was rented and returned
-
     @ElementCollection
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role_name")
     private List<String> roles = new ArrayList<>();
 
-    //Store all books that user rents
-    @ManyToMany
-    @JoinTable(
-            name = "rented_books",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "book_id")
-    )
-    private List<Book> rentedBooks = new ArrayList<>();
+    @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RentedBook> rentedBooks = new LinkedList<>();
+
 }
+
