@@ -4,6 +4,7 @@ import BMG.BookManamgnet.DTO.CustomerDTO.CustomerLoginDTO;
 import BMG.BookManamgnet.DTO.CustomerDTO.CustomerRegisterDTO;
 import BMG.BookManamgnet.Customer.Customer.Customer;
 import BMG.BookManamgnet.Customer.Customer.CustomerRepository;
+import BMG.BookManamgnet.Security.BaseAccountController;
 import BMG.BookManamgnet.Security.HelperUserInterface.HelperInterface;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import jakarta.validation.Valid;
@@ -28,36 +29,28 @@ import java.time.Instant;
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/customer_account")
-public class CustomerAccountController implements HelperInterface{
-    @Value("${security.jwt.secret-key}")
-    private String jwtSecretKey;
-
-    @Value("${security.jwt.issuer}")
-    private String jwtIssuer;
+public class CustomerAccountController extends BaseAccountController<Customer> implements HelperInterface {
 
     private final CustomerRepository customerRepository;
-    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public CustomerAccountController(CustomerRepository customerRepository,
-                                     AuthenticationManager authenticationManager) {
+    public CustomerAccountController(CustomerRepository customerRepository, AuthenticationManager authenticationManager) {
+        super(authenticationManager);
         this.customerRepository = customerRepository;
-        this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@Valid @RequestBody CustomerRegisterDTO customerRegisterDTO,
-                                               BindingResult bindingResult){
+                                               BindingResult bindingResult) {
         checkBindingResult(bindingResult);
 
-        var bCryptEncoder = new BCryptPasswordEncoder();
         Customer customer = new Customer();
         customer.getRoles().add("ROLE_USER");
         customer.setFirstname(customerRegisterDTO.getFirstName());
         customer.setLastname(customerRegisterDTO.getLastName());
         customer.setUsername(customerRegisterDTO.getUsername());
         customer.setEmail(customerRegisterDTO.getEmail());
-        customer.setPassword(bCryptEncoder.encode(customerRegisterDTO.getPassword()));
+        customer.setPassword(getPasswordEncoder().encode(customerRegisterDTO.getPassword()));
 
         try {
             var otherUser = customerRepository.findByUsername(customerRegisterDTO.getUsername());
@@ -71,66 +64,30 @@ public class CustomerAccountController implements HelperInterface{
             }
             customerRepository.save(customer);
 
-            String jwtToken = createJwtToken(customer);
-            var response = new HashMap<String, Object>();
-            response.put("token", jwtToken);
-            response.put("user", customer);
-
-            return ResponseEntity.ok(response);
+            String jwtToken = createJwtToken(customer, customer.getEmail(), customer.getRoles(), new HashMap<>());
+            return authenticateAndGenerateToken(customer.getUsername(), customerRegisterDTO.getPassword(), customer, jwtToken);
         } catch (Exception ex) {
-            System.out.println("There is an exception: ");
             ex.printStackTrace();
         }
         return ResponseEntity.badRequest().body("Error");
     }
 
-    private String createJwtToken(Customer customer){
-        Instant now = Instant.now();
+    @PostMapping("/login")
+    public ResponseEntity<Object> login(@RequestBody CustomerLoginDTO customerLoginDTO, BindingResult bindingResult) {
+        checkBindingResult(bindingResult);
+        Customer customer = customerRepository.findByUsername(customerLoginDTO.getUsername());
 
-        List<String> roleList = customer.getRoles();
-        List<String> grantedAuthorities = roleList.stream().toList();
+        if (customer == null) {
+            return ResponseEntity.badRequest().body("User not found");
+        }
 
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer(jwtIssuer)
-                .issuedAt(now)
-                .expiresAt(now.plusSeconds(25 * 3600))
-                .subject(customer.getEmail())
-                .claim("roles", grantedAuthorities) //storing roles as ROLE_USER in JWT token
-                .build();
-
-        var encoder = new NimbusJwtEncoder(
-                new ImmutableSecret<>(jwtSecretKey.getBytes()));
-        var params = JwtEncoderParameters.from(JwsHeader
-                .with(MacAlgorithm.HS256).build(), claims);
-        //create a jwt token
-        return encoder.encode(params).getTokenValue();
+        String jwtToken = createJwtToken(customer, customer.getEmail(), customer.getRoles(), new HashMap<>());
+        return authenticateAndGenerateToken(customer.getUsername(), customerLoginDTO.getPassword(), customer, jwtToken);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody CustomerLoginDTO customerLoginDTO, BindingResult bindingResult){
-        checkBindingResult(bindingResult);
-        try{
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                        customerLoginDTO.getUsername(),
-                        customerLoginDTO.getPassword()
-                    )
-            );
-            Customer customer = customerRepository.findByUsername(customerLoginDTO.getUsername());
-            String jwtToken = createJwtToken(customer);
-
-            var response = new HashMap<String, Object>();
-            response.put("token", jwtToken);
-            response.put("user", customer);
-
-            return ResponseEntity.ok(response);
-
-        }catch (Exception exception){
-            System.out.println("There is an Exception: ");
-            exception.printStackTrace();
-        }
-        System.out.println(customerLoginDTO.getUsername());
-        System.out.println(customerLoginDTO.getPassword());
-        return ResponseEntity.badRequest().body("Bad username or password.");
+    @Override
+    protected ResponseEntity<Object> registerUser(Customer user) {
+        return null; // Not needed, handled by specific registerUser method above
     }
 }
+
