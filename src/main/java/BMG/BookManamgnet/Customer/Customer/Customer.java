@@ -1,4 +1,4 @@
-package BMG.BookManamgnet.User;
+package BMG.BookManamgnet.Customer.Customer;
 
 import BMG.BookManamgnet.Book.HandelingBook.RentedBook;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -14,7 +14,7 @@ import java.util.*;
 @NoArgsConstructor
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Table(name = "my_user")
-public class AppUser {
+public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,6 +34,5 @@ public class AppUser {
 
     @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RentedBook> rentedBooks = new LinkedList<>();
-
 }
 

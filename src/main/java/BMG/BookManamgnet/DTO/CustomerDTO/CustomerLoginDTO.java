@@ -1,10 +1,10 @@
-package BMG.BookManamgnet.DTO;
+package BMG.BookManamgnet.DTO.CustomerDTO;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
-public class LoginDTO {
+public class CustomerLoginDTO {
     @NotEmpty
     private String username;
     @NotEmpty

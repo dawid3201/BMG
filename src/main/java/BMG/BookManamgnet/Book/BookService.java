@@ -2,7 +2,7 @@ package BMG.BookManamgnet.Book;
 
 import BMG.BookManamgnet.Exception.BookAlreadyAddedException;
 import BMG.BookManamgnet.Exception.NoBookTypeFoundException;
-import BMG.BookManamgnet.User.AppUserRepository;
+import BMG.BookManamgnet.Customer.Customer.CustomerRepository;
 import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BookService {
     private final BookRepository bookRepository;
-    private final AppUserRepository appUserRepository;
+    private final CustomerRepository customerRepository;
 
 
     public final List<Book> getBooks(){

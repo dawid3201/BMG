@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @RestController
 @AllArgsConstructor
-@RequestMapping("/book")
+@RequestMapping("/api/book")
+@CrossOrigin(origins = "http://localhost:3000")
 public class BookAPI {
     private final BookService bookService;
 
@@ -28,5 +29,4 @@ public class BookAPI {
     public ResponseEntity<List<Book>> getBooksByTitle(@RequestParam("title") String title) throws NoBookTypeFoundException {
         return ResponseEntity.ok(bookService.findByTitle(title));
     }
-
 }

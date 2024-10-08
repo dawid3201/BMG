@@ -1,6 +1,5 @@
-package BMG.BookManamgnet.DTO;
+package BMG.BookManamgnet.DTO.CustomerDTO;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -8,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class RegisterDTO {
+public class CustomerRegisterDTO {
     @NotEmpty
     private String firstName;
 
@@ -27,7 +26,4 @@ public class RegisterDTO {
     @Size(min = 8)
     @Pattern(regexp = "[a-zA-Z0-9_]+")
     private String password;
-
-    @JsonProperty
-    private Boolean AdminCondition;
 }
